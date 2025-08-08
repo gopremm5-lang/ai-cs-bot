@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title><%= typeof title !== 'undefined' ? title : "Admin Panel Vylozzone" %></title>
+  <% var customCss = typeof customCss === "undefined" ? null : customCss; %>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="stylesheet" href="/css/style.css">
+  <% if (customCss) { %>
+    <link rel="stylesheet" href="/css/<%= customCss %>">
+  <% } %>
+  <link rel="icon" href="/images/logo.png">
+</head>
+<body>
+<%- include('navbar', { active }) %>
+<% if (typeof toast !== "undefined" && toast) { %>
+  <div class="toast <%= toast.type %>"><%= toast.msg %></div>
+<% } %>

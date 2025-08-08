@@ -1,0 +1,127 @@
+<%- include('partials/header', { title: "User Royal", active: "buyers", toast, customCss: null }) %>
+<%- include('partials/sidebar', { active: "buyers" }) %>
+<div class="main-content">
+  <h2>User Royal</h2>
+  <div class="card">
+
+    <!-- ===================== -->
+    <!-- Form Input Data User Royal -->
+    <!-- ===================== -->
+    <form method="post" action="/buyers/save" class="form-inline mb-3" style="margin-bottom:22px;">
+  <input type="text" name="user" placeholder="Nomor WA User" required>
+  <select name="apk" required>
+    <option value="">Pilih APK</option>
+    <option>alight motion</option>
+              <option>apple music</option>
+              <option>bstation</option>
+              <option>canva</option>
+              <option>capcut</option>
+              <option>catchplay</option>
+              <option>chatgpt</option>
+              <option>disney</option>
+              <option>get contact</option>
+              <option>hbo max</option>
+              <option>iqiyi</option>
+              <option>netflix</option>
+              <option>picsart</option>
+              <option>prime vidio</option>
+              <option>remini</option>
+              <option>vidio</option>
+              <option>vision+</option>
+              <option>viu</option>
+              <option>wetv</option>
+              <option>youtube</option>
+            </select>
+          <input type="email" name="email" placeholder="Email Pembeli" required>
+  <input type="text" name="durasi" placeholder="Durasi (misal: 1 bulan, 90 hari, dsb)" required>
+  <input type="date" name="dateGiven" required>
+  <input type="date" name="exp" required>
+  <input type="email" name="invite" placeholder="Email Invite" required>
+  <button type="submit">Tambah</button>
+</form>
+
+    <!-- ===================== -->
+    <!-- Ringkasan Pembeli Loyal (Aggregated) -->
+    <!-- ===================== -->
+    <% if (buyersAggregated && buyersAggregated.length > 0) { %>
+      <h3>Ringkasan Pembeli Loyal</h3>
+      <table>
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Nomor WA</th>
+      <th>Total Pembelian</th>
+      <th>Statistik APK</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% buyersAggregated.forEach((item, i) => { %>
+      <tr>
+        <td><%= i+1 %></td>
+        <td><%= item.user %></td>
+        <td><%= item.total %></td>
+       <td>
+  <% if(item.statistik && Object.keys(item.statistik).length) { %>
+    <% for (let apk in item.statistik) { %>
+      <span class="badge">
+        <%= apk %>
+        <% for (let durasi in item.statistik[apk].rincian) { %>
+          (<%= durasi %>: <%= item.statistik[apk].rincian[durasi] %>)
+        <% } %>
+      </span>
+    <% } %>
+  <% } else { %>
+    <span style="color:#bbb">-</span>
+  <% } %>
+</td>
+
+      </tr>
+    <% }); %>
+  </tbody>
+</table>
+    <% } else { %>
+      <p>Tidak ada data pembeli.</p>
+    <% } %>
+
+    <!-- Riwayat Transaksi Lengkap -->
+    <% if (buyers && buyers.length > 0) { %>
+      <h3>Riwayat Transaksi Lengkap</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nomor WA</th>
+            <th>APK</th>
+            <th>Email Pembeli</th>
+            <th>Durasi</th>
+            <th>Tanggal Pemberian</th>
+            <th>Expired</th>
+            <th>Email Invite</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% let num = 1; %>
+          <% buyers.forEach(user => { %>
+            <% if (Array.isArray(user.data)) { %>
+              <% user.data.forEach(trx => { %>
+                <tr>
+                  <td><%= num++ %></td>
+                  <td><%= user.user %></td>
+                  <td><%= trx.apk %></td>
+                  <td><%= trx.email %></td>
+                  <td><%= trx.durasi %></td>
+                  <td><%= trx.dateGiven %></td>
+                  <td><%= trx.exp %></td>
+                  <td><%= trx.invite %></td>
+                </tr>
+              <% }) %>
+            <% } %>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } %>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>

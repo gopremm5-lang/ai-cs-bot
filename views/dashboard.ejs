@@ -1,0 +1,51 @@
+<%- include('partials/header', { title: "Dashboard", active: "dashboard", toast, customCss: null }) %>
+<%- include('partials/sidebar', { active: "dashboard" }) %>
+<div class="main-content">
+  <h2>Dashboard</h2>
+  <div class="row g-4 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card text-center">
+        <div class="display-5 fw-bold text-primary mb-2"><%= stats.produk %></div>
+        <div class="fw-medium">Produk</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center">
+        <div class="display-5 fw-bold text-success mb-2"><%= stats.promo %></div>
+        <div class="fw-medium">Promo</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center">
+        <div class="display-5 fw-bold text-info mb-2"><%= stats.faq %></div>
+        <div class="fw-medium">FAQ</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center">
+        <div class="display-5 fw-bold text-warning mb-2"><%= stats.claim %></div>
+        <div class="fw-medium">Claim</div>
+      </div>
+    </div>
+  </div>
+  <div class="card p-4">
+    <h5>Grafik Order (Dummy)</h5>
+    <canvas id="chartOrder" height="70"></canvas>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  new Chart(document.getElementById('chartOrder').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+      datasets: [{
+        label: 'Order',
+        data: [15, 23, 17, 32, 28, 44],
+        backgroundColor: '#3b82f6'
+      }]
+    },
+    options: { responsive: true }
+  });
+</script>
+<%- include('partials/footer') %>

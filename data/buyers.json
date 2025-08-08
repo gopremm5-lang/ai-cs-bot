@@ -1,0 +1,37 @@
+[
+  {
+    "user": "kakakakk",
+    "statistik": {
+      "alight motion": {
+        "total": 1,
+        "rincian": {
+          "12 bulan": 1
+        }
+      },
+      "chatgpt": {
+        "total": 1,
+        "rincian": {
+          "12 bulan": 1
+        }
+      }
+    },
+    "data": [
+      {
+        "apk": "alight motion",
+        "email": "kaka@gmail.com",
+        "durasi": "12 bulan",
+        "dateGiven": "2025-08-14",
+        "exp": "2025-08-29",
+        "invite": "kampang@gmail.com"
+      },
+      {
+        "apk": "chatgpt",
+        "email": "kaka@gmail.com",
+        "durasi": "12 bulan",
+        "dateGiven": "2025-08-22",
+        "exp": "2025-09-05",
+        "invite": "kaika@gmail.com"
+      }
+    ]
+  }
+]

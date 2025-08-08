@@ -1,0 +1,42 @@
+<%- include('partials/header', { title: "FAQ", active: "faq", toast, customCss: null }) %>
+<%- include('partials/sidebar', { active: "faq" }) %>
+<div class="main-content">
+  <h2>FAQ (Frequently Asked Questions)</h2>
+  <form method="post" action="/faq/save" class="card mb-4">
+    <input type="hidden" name="idx" value="">
+    <div>
+      <label>Pertanyaan:</label>
+      <input type="text" name="question" required class="input">
+    </div>
+    <div>
+      <label>Jawaban:</label>
+      <textarea name="answer" required class="input"></textarea>
+    </div>
+    <button type="submit" class="btn">Tambah FAQ</button>
+  </form>
+  <% if (faq && faq.length > 0) { %>
+    <div class="card">
+      <table>
+        <thead><tr><th>No</th><th>Pertanyaan</th><th>Jawaban</th><th></th></tr></thead>
+        <tbody>
+        <% faq.forEach((item, i) => { %>
+          <tr>
+            <td><%= i+1 %></td>
+            <td><%= item.question %></td>
+            <td><%= item.answer %></td>
+            <td>
+              <form method="post" action="/faq/delete" style="display:inline">
+                <input type="hidden" name="idx" value="<%= i %>">
+                <button class="btn btn-danger" onclick="return confirm('Hapus FAQ ini?')">🗑️</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="card">Belum ada FAQ.</div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

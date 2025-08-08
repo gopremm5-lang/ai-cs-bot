@@ -1,0 +1,23 @@
+<%- include('partials/header', { title: "Produk", active: "produk", toast }) %>
+<%- include('partials/sidebar', { active: "produk" }) %>
+<div class="main-content">
+  <h2>Manajemen Produk</h2>
+  <form class="form-inline mb-3 card" action="/produk/save" method="POST">
+    <input name="produk" class="input" placeholder="Nama produk (ex: netflix)" required>
+    <textarea name="content" class="input" rows="4" placeholder="Detail produk..." required></textarea>
+    <button class="btn">Simpan Produk</button>
+  </form>
+  <div class="grid-2 gap-2">
+    <% produk.forEach(p => { %>
+      <div class="card animate__animated animate__fadeInUp">
+        <h4 class="mb-1"><%= p.name %></h4>
+        <pre style="white-space:pre-wrap;font-size:13px;"><%= p.content %></pre>
+        <form action="/produk/delete" method="POST" style="display:inline">
+          <input type="hidden" name="produk" value="<%= p.name %>">
+          <button class="btn btn-danger" onclick="return confirm('Hapus produk ini?')">Hapus</button>
+        </form>
+      </div>
+    <% }) %>
+  </div>
+</div>
+<%- include('partials/footer', { toast }) %>
