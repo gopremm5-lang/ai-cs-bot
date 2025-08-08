@@ -83,7 +83,11 @@
     <% if (error) { %>
       <div class="error-msg"><%= error %></div>
     <% } %>
-    <input type="password" name="password" class="input" placeholder="Masukkan password admin..." required autofocus autocomplete="current-password">
+    <select name="role" class="input" required>
+      <option value="admin">Admin</option>
+      <option value="owner">Owner</option>
+    </select>
+    <input type="password" name="password" class="input" placeholder="Masukkan password..." required autofocus autocomplete="current-password">
     <button type="submit" class="btn-login">Login</button>
   </form>
 </body>

@@ -20,7 +20,7 @@
             <td><%= item.status || "OPEN" %></td>
             <td class="countdown" data-timestamp="<%= item.timestamp %>">--</td>
             <td>
-              <% if ((item.status || "OPEN") !== "RESOLVED") { %>
+              <% if (role === 'owner' && (item.status || "OPEN") !== "RESOLVED") { %>
                 <form method="post" action="/claims-replace/resolve">
                   <input type="hidden" name="index" value="<%= i %>">
                   <button class="btn btn-success" onclick="return confirm('Tandai selesai?')">✔️</button>

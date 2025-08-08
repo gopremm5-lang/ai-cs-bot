@@ -6,10 +6,13 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const fs = require("fs").promises;
 const crypto = require("crypto");
+const { loadFAQ, loadSOP } = require('./lib/dataLoader');
+const { requireLogin, requireOwner } = require('./lib/auth');
 
 const app = express();
 const PORT = process.env.PORT || 9011;
 const ADMIN_PASS = process.env.ADMIN_PASS || "Konfirmasi"; // .env
+const OWNER_PASS = process.env.OWNER_PASS || "OwnerKonfirmasi";
 
 // ================== SETUP ==================
 app.set("view engine", "ejs");
@@ -22,14 +25,14 @@ app.use(session({
   saveUninitialized: true,
   cookie: { maxAge: 8 * 60 * 60 * 1000 }
 }));
+app.use((req, res, next) => {
+  res.locals.role = req.session.role;
+  next();
+});
 app.use('/buyers', require('./routes/buyers'));
 app.use("/stock", require('./routes/stock'));
-
-// --- Helper: login required ---
-function requireLogin(req, res, next) {
-  if (req.session && req.session.isLoggedIn) return next();
-  res.redirect("/login");
-}
+app.use('/faq', require('./routes/faq'));
+app.use('/sop', require('./routes/sop'));
 
 // --- Helper: show toast ---
 function setToast(req, type, msg) {
@@ -80,12 +83,15 @@ app.get("/login", (req, res) => {
   res.render("login", { error: null });
 });
 app.post("/login", (req, res) => {
-  const { password } = req.body;
-  if (password === ADMIN_PASS) {
+  const { role, password } = req.body;
+  const valid = (role === 'owner' && password === OWNER_PASS) ||
+                (role === 'admin' && password === ADMIN_PASS);
+  if (valid) {
     req.session.isLoggedIn = true;
+    req.session.role = role;
     res.redirect("/dashboard");
   } else {
-    res.render("login", { error: "Password salah!" });
+    res.render("login", { error: "Role atau password salah!" });
   }
 });
 
@@ -100,15 +106,15 @@ app.get(["/", "/dashboard"], requireLogin, async (req, res) => {
   const [produk, promo, faq, sop, claim] = await Promise.all([
     listProdukFiles(),
     loadJson("promo.json"),
-    loadJson("faq.json"),
-    loadJson("sop.json"),
+    loadFAQ(),
+    loadSOP(),
     loadJson("log_claim.json")
   ]);
   const stats = {
     produk: produk.length,
     promo: Array.isArray(promo) ? promo.length : 0,
-    faq: Array.isArray(faq) ? faq.length : 0,
-    sop: Array.isArray(sop) ? sop.length : 0,
+    faq: faq.length,
+    sop: sop.length,
     claim: Array.isArray(claim) ? claim.length : 0
   };
   const toast = req.session.toast || null;
@@ -123,7 +129,7 @@ app.get("/produk", requireLogin, async (req, res) => {
   delete req.session.toast;
   res.render("produk", { produk, toast });
 });
-app.post("/produk/save", requireLogin, async (req, res) => {
+app.post("/produk/save", requireOwner, async (req, res) => {
   const { produk, content } = req.body;
   if (!produk || !content) {
     setToast(req, "danger", "Nama produk & konten wajib diisi!");
@@ -133,66 +139,14 @@ app.post("/produk/save", requireLogin, async (req, res) => {
   setToast(req, "success", "Produk berhasil disimpan.");
   res.redirect("/produk");
 });
-app.post("/produk/delete", requireLogin, async (req, res) => {
+app.post("/produk/delete", requireOwner, async (req, res) => {
   const { produk } = req.body;
   try { await fs.unlink(path.join(produkDir, produk.toLowerCase() + ".txt")); } catch {}
   setToast(req, "success", "Produk berhasil dihapus.");
   res.redirect("/produk");
 });
 
-// --- FAQ ---
-app.get("/faq", requireLogin, async (req, res) => {
-  const faq = await loadJson("faq.json");
-  const toast = req.session.toast || null;
-  delete req.session.toast;
-  res.render("faq", { faq, toast }); // <--- toast DIKIRIM
-});
-
-app.post("/faq/save", requireLogin, async (req, res) => {
-  let { idx, question, answer } = req.body;
-  let faq = await loadJson("faq.json");
-  if (!faq || !Array.isArray(faq)) faq = [];
-  if (idx === "") { faq.push({ question, answer }); }
-  else { faq[idx] = { question, answer }; }
-  await saveJson("faq.json", faq);
-  setToast(req, "success", "FAQ berhasil disimpan.");
-  res.redirect("/faq");
-});
-app.post("/faq/delete", requireLogin, async (req, res) => {
-  let { idx } = req.body;
-  let faq = await loadJson("faq.json");
-  faq.splice(idx, 1);
-  await saveJson("faq.json", faq);
-  setToast(req, "success", "FAQ dihapus.");
-  res.redirect("/faq");
-});
-
-// --- SOP ---
-app.get("/sop", requireLogin, async (req, res) => {
-  const sop = await loadJson("sop.json");
-  const toast = req.session.toast || null;
-  delete req.session.toast;
-  res.render("sop", { sop, toast }); // <--- toast DIKIRIM
-});
-
-app.post("/sop/save", requireLogin, async (req, res) => {
-  let { idx, trigger, response } = req.body;
-  let sop = await loadJson("sop.json");
-  if (!sop || !Array.isArray(sop)) sop = [];
-  if (idx === "") { sop.push({ trigger: trigger.split(","), response: [response] }); }
-  else { sop[idx] = { trigger: trigger.split(","), response: [response] }; }
-  await saveJson("sop.json", sop);
-  setToast(req, "success", "SOP berhasil disimpan.");
-  res.redirect("/sop");
-});
-app.post("/sop/delete", requireLogin, async (req, res) => {
-  let { idx } = req.body;
-  let sop = await loadJson("sop.json");
-  sop.splice(idx, 1);
-  await saveJson("sop.json", sop);
-  setToast(req, "success", "SOP dihapus.");
-  res.redirect("/sop");
-});
+// FAQ & SOP routes moved to separate modules
 
 // --- PROMO ---
 app.get("/promo", requireLogin, async (req, res) => {
@@ -201,7 +155,7 @@ app.get("/promo", requireLogin, async (req, res) => {
   delete req.session.toast;
   res.render("promo", { promo, toast }); // <--- toast DIKIRIM
 });
-app.post("/promo/save", requireLogin, async (req, res) => {
+app.post("/promo/save", requireOwner, async (req, res) => {
   let { idx, banner, active } = req.body;
   let promo = await loadJson("promo.json");
   if (!promo || !Array.isArray(promo)) promo = [];
@@ -211,7 +165,7 @@ app.post("/promo/save", requireLogin, async (req, res) => {
   setToast(req, "success", "Promo berhasil disimpan.");
   res.redirect("/promo");
 });
-app.post("/promo/delete", requireLogin, async (req, res) => {
+app.post("/promo/delete", requireOwner, async (req, res) => {
   let { idx } = req.body;
   let promo = await loadJson("promo.json");
   promo.splice(idx, 1);
@@ -227,7 +181,7 @@ app.get("/claim", requireLogin, async (req, res) => {
   delete req.session.toast;
   res.render("claim", { claim, toast }); // <--- toast DIKIRIM
 });
-app.post("/claim/resolve", requireLogin, async (req, res) => {
+app.post("/claim/resolve", requireOwner, async (req, res) => {
   let { idx } = req.body;
   let claim = await loadJson("log_claim.json");
   claim[idx].status = "RESOLVED";
@@ -243,7 +197,7 @@ app.get("/blacklist", requireLogin, async (req, res) => {
   delete req.session.toast;
   res.render("blacklist", { blacklist, toast }); // <--- toast DIKIRIM
 });
-app.post("/blacklist/save", requireLogin, async (req, res) => {
+app.post("/blacklist/save", requireOwner, async (req, res) => {
   let { user, reason } = req.body;
   let blacklist = await loadJson("blacklist.json");
   if (!blacklist || !Array.isArray(blacklist)) blacklist = [];
@@ -252,7 +206,7 @@ app.post("/blacklist/save", requireLogin, async (req, res) => {
   setToast(req, "success", "User masuk blacklist.");
   res.redirect("/blacklist");
 });
-app.post("/blacklist/delete", requireLogin, async (req, res) => {
+app.post("/blacklist/delete", requireOwner, async (req, res) => {
   let { idx } = req.body;
   let blacklist = await loadJson("blacklist.json");
   blacklist.splice(idx, 1);
@@ -286,7 +240,7 @@ app.get("/claims-replace", requireLogin, async (req, res) => {
   res.render("claims_replace", { claimsReplace, toast });
 });
 
-app.post("/claims-replace/resolve", requireLogin, async (req, res) => {
+app.post("/claims-replace/resolve", requireOwner, async (req, res) => {
   const { index } = req.body;
   let claimsReplace = await loadJson("claimsReplace.json");
   if (!Array.isArray(claimsReplace)) claimsReplace = [];
@@ -305,7 +259,7 @@ app.get("/claims-reset", requireLogin, async (req, res) => {
   res.render("claims_reset", { claimsReset, toast });
 });
 
-app.post("/claims-reset/mark", requireLogin, async (req, res) => {
+app.post("/claims-reset/mark", requireOwner, async (req, res) => {
   const { index } = req.body;
   let claimsReset = await loadJson("claimsReset.json");
   if (!Array.isArray(claimsReset)) claimsReset = [];
@@ -324,7 +278,7 @@ app.use((req, res) => {
 (async () => {
   await fs.mkdir(produkDir, { recursive: true });
   app.listen(PORT, () => {
-  console.log(`Admin Panel running on http://31.220.108.145:${PORT}/login`);
-  // open(`http://31.220.108.145:${PORT}/login`); // Boleh dihapus kalau di VPS
+  console.log(`Admin Panel running on port ${PORT}`);
+  // open(`http://localhost:${PORT}/login`); // Boleh dihapus kalau di VPS
 });
 })();

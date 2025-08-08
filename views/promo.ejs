@@ -2,6 +2,7 @@
 <%- include('partials/sidebar', { active: "promo" }) %>
 <div class="main-content">
   <h2>Banner Promo</h2>
+  <% if (role === 'owner') { %>
   <form method="post" action="/promo/save" class="card mb-4">
     <input type="hidden" name="idx" value="">
     <div>
@@ -14,6 +15,7 @@
     </div>
     <button type="submit" class="btn">Tambah Promo</button>
   </form>
+  <% } %>
   <% if (promo && promo.length > 0) { %>
     <div class="card">
       <table>
@@ -25,10 +27,12 @@
             <td><%= item.banner %></td>
             <td><%= item.active ? "Aktif" : "Nonaktif" %></td>
             <td>
+              <% if (role === 'owner') { %>
               <form method="post" action="/promo/delete" style="display:inline">
                 <input type="hidden" name="idx" value="<%= i %>">
                 <button class="btn btn-danger" onclick="return confirm('Hapus promo ini?')">🗑️</button>
               </form>
+              <% } %>
             </td>
           </tr>
         <% }) %>

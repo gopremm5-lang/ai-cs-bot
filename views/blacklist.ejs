@@ -2,6 +2,7 @@
 <%- include('partials/sidebar', { active: "blacklist" }) %>
 <div class="main-content">
   <h2>Blacklist</h2>
+  <% if (role === 'owner') { %>
   <form method="post" action="/blacklist/save" class="card mb-4">
     <div>
       <label>User (nomor/nama):</label>
@@ -13,6 +14,7 @@
     </div>
     <button type="submit" class="btn">Tambah Blacklist</button>
   </form>
+  <% } %>
   <% if (blacklist && blacklist.length > 0) { %>
     <div class="card">
       <table>
@@ -25,10 +27,12 @@
             <td><%= item.reason %></td>
             <td><%= new Date(item.date).toLocaleDateString("id-ID") %></td>
             <td>
+              <% if (role === 'owner') { %>
               <form method="post" action="/blacklist/delete" style="display:inline">
                 <input type="hidden" name="idx" value="<%= i %>">
                 <button class="btn btn-danger" onclick="return confirm('Hapus blacklist ini?')">🗑️</button>
               </form>
+              <% } %>
             </td>
           </tr>
         <% }) %>
