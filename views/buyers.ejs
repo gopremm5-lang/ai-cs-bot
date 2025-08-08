@@ -7,6 +7,7 @@
     <!-- ===================== -->
     <!-- Form Input Data User Royal -->
     <!-- ===================== -->
+    <% if (role === 'owner') { %>
     <form method="post" action="/buyers/save" class="form-inline mb-3" style="margin-bottom:22px;">
   <input type="text" name="user" placeholder="Nomor WA User" required>
   <select name="apk" required>
@@ -39,6 +40,7 @@
   <input type="email" name="invite" placeholder="Email Invite" required>
   <button type="submit">Tambah</button>
 </form>
+    <% } %>
 
     <!-- ===================== -->
     <!-- Ringkasan Pembeli Loyal (Aggregated) -->

@@ -14,7 +14,7 @@
             <td><%= item.message %></td>
             <td><%= item.status || 'OPEN' %></td>
             <td>
-              <% if ((item.status || 'OPEN') !== 'RESOLVED') { %>
+              <% if (role === 'owner' && (item.status || 'OPEN') !== 'RESOLVED') { %>
                 <form method="post" action="/claim/resolve" style="display:inline">
                   <input type="hidden" name="idx" value="<%= i %>">
                   <button class="btn btn-success" onclick="return confirm('Tandai sebagai selesai?')">✔️</button>

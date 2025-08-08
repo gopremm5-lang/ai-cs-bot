@@ -30,3 +30,8 @@
       .stock-form{flex-direction:column;padding:14px;}
       .email-detail-table{padding:8px;}
     }
+
+    /* generic modern table style */
+    .table-modern{width:100%;border-collapse:collapse;}
+    .table-modern th,.table-modern td{border:1px solid #e4e7ea;padding:7px 12px;text-align:left;}
+    .table-modern th{background:#f4f6ff;}

@@ -20,7 +20,7 @@
             <td><%= item.nextReset %></td>
             <td><%= item.done ? 'Done' : 'Pending' %></td>
             <td>
-              <% if (!item.done) { %>
+              <% if (role === 'owner' && !item.done) { %>
                 <form method="post" action="/claims-reset/mark">
                   <input type="hidden" name="index" value="<%= i %>">
                   <button class="btn btn-success" onclick="return confirm('Tandai reset sudah dilakukan?')">✔️</button>

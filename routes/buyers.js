@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { loadJson, saveJson } = require("../lib/dataLoader");
+const { requireOwner } = require('../lib/auth');
 
 // Daftar APK valid (harus sama dengan dropdown form)
 const VALID_APK = [
@@ -16,7 +17,7 @@ function normalisasi(text) {
 }
 
 // ====== ROUTE SAVE ======
-router.post('/save', async (req, res) => {
+router.post('/save', requireOwner, async (req, res) => {
   const { user, apk, email, durasi, dateGiven, exp, invite } = req.body;
 
   // Validasi input kosong
