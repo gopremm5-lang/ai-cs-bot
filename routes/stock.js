@@ -2,11 +2,8 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs").promises;
 const router = express.Router();
+const { requireLogin, requireOwner } = require('../lib/auth');
 
-function requireLogin(req, res, next) {
-  if (req.session && req.session.isLoggedIn) return next();
-  res.redirect("/login");
-}
 function setToast(req, type, msg) {
   req.session.toast = { type, msg };
 }
@@ -27,7 +24,7 @@ router.get("/", requireLogin, async (req, res) => {
 });
 
 // Tambah akun baru
-router.post("/add", requireLogin, async (req, res) => {
+router.post("/add", requireOwner, async (req, res) => {
   const { apk, email, pin, dateCreated, exp } = req.body;
   if (!apk || !email || !pin || !dateCreated || !exp) {
     setToast(req, "danger", "Semua field wajib diisi.");
@@ -41,7 +38,7 @@ router.post("/add", requireLogin, async (req, res) => {
 });
 
 // Tambah slot baru ke email tertentu
-router.post("/add-slot", requireLogin, async (req, res) => {
+router.post("/add-slot", requireOwner, async (req, res) => {
   const { apk, email, userEmail, userNumber, pin, duration, dateCreated, exp } = req.body;
   if (!apk || !email || !userEmail || !userNumber || !pin || !duration || !dateCreated || !exp) {
     setToast(req, "danger", "Semua field slot wajib diisi!");
@@ -61,7 +58,7 @@ router.post("/add-slot", requireLogin, async (req, res) => {
 });
 
 // Hapus akun/email
-router.get("/delete", requireLogin, async (req, res) => {
+router.get("/delete", requireOwner, async (req, res) => {
   const { apk, idx } = req.query;
   let stock = await loadStock();
   const filtered = stock.filter((a, i) => !(a.apk.toLowerCase() === apk && i == idx));

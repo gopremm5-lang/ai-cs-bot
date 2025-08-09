@@ -7,6 +7,7 @@
     <!-- ===================== -->
     <!-- Form Input Data User Royal -->
     <!-- ===================== -->
+    <% if (role === 'owner') { %>
     <form method="post" action="/buyers/save" class="form-inline mb-3" style="margin-bottom:22px;">
   <input type="text" name="user" placeholder="Nomor WA User" required>
   <select name="apk" required>
@@ -39,13 +40,14 @@
   <input type="email" name="invite" placeholder="Email Invite" required>
   <button type="submit">Tambah</button>
 </form>
+    <% } %>
 
     <!-- ===================== -->
     <!-- Ringkasan Pembeli Loyal (Aggregated) -->
     <!-- ===================== -->
     <% if (buyersAggregated && buyersAggregated.length > 0) { %>
       <h3>Ringkasan Pembeli Loyal</h3>
-      <table>
+      <table class="table-modern">
   <thead>
     <tr>
       <th>No</th>
@@ -86,7 +88,7 @@
     <!-- Riwayat Transaksi Lengkap -->
     <% if (buyers && buyers.length > 0) { %>
       <h3>Riwayat Transaksi Lengkap</h3>
-      <table>
+      <table class="table-modern">
         <thead>
           <tr>
             <th>No</th>
