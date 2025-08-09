@@ -2,6 +2,7 @@
 <%- include('partials/sidebar', { active: "sop" }) %>
 <div class="main-content">
   <h2>SOP (Standard Operating Procedure)</h2>
+  <% if (role === 'owner') { %>
   <form method="post" action="/sop/save" class="card mb-4">
     <input type="hidden" name="idx" value="">
     <div>
@@ -14,21 +15,24 @@
     </div>
     <button type="submit" class="btn">Tambah SOP</button>
   </form>
+  <% } %>
   <% if (sop && sop.length > 0) { %>
     <div class="card">
-      <table>
+      <table class="table-modern">
         <thead><tr><th>No</th><th>Trigger</th><th>Response</th><th></th></tr></thead>
         <tbody>
         <% sop.forEach((item, i) => { %>
           <tr>
             <td><%= i+1 %></td>
-            <td><%= item.trigger.join(", ") %></td>
-            <td><%= item.response.join(" / ") %></td>
+            <td><%= item.trigger.join(', ') %></td>
+            <td><%= item.response %></td>
             <td>
+              <% if (role === 'owner') { %>
               <form method="post" action="/sop/delete" style="display:inline">
-                <input type="hidden" name="idx" value="<%= i %>">
+                <input type="hidden" name="file" value="<%= item.file %>">
                 <button class="btn btn-danger" onclick="return confirm('Hapus SOP ini?')">🗑️</button>
               </form>
+              <% } %>
             </td>
           </tr>
         <% }) %>

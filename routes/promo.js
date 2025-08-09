@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { loadPromo, saveJson } = require('./lib/dataLoader');
+const { loadPromo, saveJson } = require('../lib/dataLoader');
 
 router.get("/", async (req, res) => {
   const promo = await loadPromo() || [];

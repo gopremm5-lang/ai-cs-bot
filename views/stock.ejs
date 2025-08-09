@@ -5,6 +5,7 @@
   <h2>Stock Akun Berdasarkan APK</h2>
   
   <!-- Form Tambah Akun -->
+  <% if (role === 'owner') { %>
   <div class="card">
     <form method="post" action="/stock/add" class="form-inline mb-3">
       <input type="text" name="apk" class="input" placeholder="Nama APK (ex: youtube)" required>
@@ -15,6 +16,7 @@
       <button type="submit" class="btn">Tambah</button>
     </form>
   </div>
+  <% } %>
 
   <!-- Grouping by APK -->
   <% 
@@ -38,7 +40,7 @@
           </div>
 
           <% if (account.slots && account.slots.length > 0) { %>
-            <table class="stock-table">
+            <table class="stock-table table-modern">
               <thead>
                 <tr>
                   <th>Slot</th>

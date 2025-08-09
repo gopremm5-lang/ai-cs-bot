@@ -23,29 +23,48 @@
     </div>
     <div class="col-6 col-md-3">
       <div class="card text-center">
+        <div class="display-5 fw-bold text-secondary mb-2"><%= stats.sop %></div>
+        <div class="fw-medium">SOP</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center">
         <div class="display-5 fw-bold text-warning mb-2"><%= stats.claim %></div>
         <div class="fw-medium">Claim</div>
       </div>
     </div>
   </div>
   <div class="card p-4">
-    <h5>Grafik Order (Dummy)</h5>
-    <canvas id="chartOrder" height="70"></canvas>
+    <h5>Statistik Data</h5>
+    <canvas id="statsChart" height="70"></canvas>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  new Chart(document.getElementById('chartOrder').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
-      datasets: [{
-        label: 'Order',
-        data: [15, 23, 17, 32, 28, 44],
-        backgroundColor: '#3b82f6'
-      }]
-    },
-    options: { responsive: true }
-  });
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const stats = <%- JSON.stringify(stats) %>;
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(stats),
+        datasets: [{
+          label: 'Jumlah',
+          data: Object.values(stats),
+          backgroundColor: 'rgba(59,130,246,0.65)',
+          borderColor: '#3b82f6',
+          borderWidth: 1,
+          borderRadius: 6,
+          maxBarThickness: 40
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { beginAtZero: true, grid: { color: '#e5e7eb' }, ticks: { stepSize: 1 } }
+        }
+      }
+    });
+  </script>
 <%- include('partials/footer') %>

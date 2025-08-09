@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { loadLogClaim, saveJson } = require('./lib/dataLoader');
+const { loadLogClaim, saveJson } = require('../lib/dataLoader');
 
 router.get("/", async (req, res) => {
   const claim = await loadLogClaim() || [];
